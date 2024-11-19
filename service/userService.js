@@ -1,26 +1,58 @@
+const bcrypt = require('bcrypt');
 const { User } = require('../models');
 
-const createUser = async ({ name, email, password }) => {
+
+const createUser = async ({ username, email, password,referralLink, country, verificationToken }) => {
     // Check if the user already exists
-    const existingUser = await User.findOne({ where: { email } });
-    if (existingUser) {
+    const existingEmail = await User.findOne({ where: { email } });
+    const existingUsername = await User.findOne({where: {username}})
+    
+    if(existingEmail){
+        throw new Error('Email is already taken');
+    }
+
+    if (existingUsername) {
         throw new Error('Email is already in use');
     }
 
     // Hash the password (optional, using bcrypt for example)
-    const bcrypt = require('bcrypt');
-    const hashedPassword = await bcrypt.hash(password, 10);
+    
+    const salt = await bcrypt.genSalt(10);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     // Create the user
     const user = await User.create({
-        name,
+        username,
         email,
-        password: hashedPassword
+        password: hashedPassword,
+        country,
+        referralLink,
+        verificationToken
     });
 
     return user;
 };
 
+const findUserByEmail = async() =>{
+    const user = await User.findOne({where: {email} });
+
+    if(!user){
+        throw new Error("User not found!")
+    }
+    return user;
+}
+
+const findUserById = async() =>{
+    const user = await User.findOne({where: {id} });
+
+    if(!user){
+        throw new Error("User not found!")
+    }
+    return user;
+}
+
 module.exports = {
-    createUser
+    createUser,
+    findUserByEmail,
+    findUserById
 };

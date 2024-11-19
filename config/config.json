@@ -2,8 +2,8 @@
   "development": {
     "username": "root",
     "password": "Dubemernest@23",
-    "database": "memeOrbit",
-    "host": "127.0.0.1",
+    "database": "memeorbit",
+    "host": "localhost",
     "dialect": "mysql"
   }
 }

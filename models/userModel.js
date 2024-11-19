@@ -44,6 +44,32 @@ module.exports = (sequelize, DataTypes) => {
         referralLink: {
             type: DataTypes.STRING,
         },
+        verificationToken: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        isVerified: {
+            type: DataTypes.BOOLEAN,
+            defaultValue: false
+        },
+        verificationDate:{
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+        passwordResetToken: {
+            type: DataTypes.STRING,
+            allowNull: true,
+        },
+        passwordResetExpires: {
+            type: DataTypes.DATE,
+            allowNull: true,
+        },
+        role: {
+            type: DataTypes.ENUM,
+            values: ["user", "admin"],
+            defaultValue: 'user',
+            allowNull: false,
+        }
     }, { timestamps: true });
 
     return User;

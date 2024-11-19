@@ -4,6 +4,7 @@ const express = require("express");
 const morgan = require("morgan");
 const cors =  require("cors");
 const path =  require("path")
+const authRouter = require("./routes/authRoute");
 const app = express();
 
 const allowedOrigins = [  
@@ -24,7 +25,7 @@ app.use(cors(corsOpt));
 app.use(morgan("dev"));
 
 // routes
-// app.use('/api/v1/user', );
+app.use('/api/v1/auth', authRouter);
 // app.use('/api/v1', );
 
 app.get("/health-check", (req,res) =>{
