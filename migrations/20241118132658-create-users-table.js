@@ -7,6 +7,7 @@ module.exports = {
       id: {
         allowNull: false,
         primaryKey: true,
+        unique:true,
         type: Sequelize.UUID,
         defaultValue: Sequelize.UUIDV4,
       },
@@ -14,11 +15,17 @@ module.exports = {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
+        validate: {
+          len: [2-30]
+        },
       },
       email: {
         type: Sequelize.STRING,
         allowNull: false,
         unique: true,
+        validate: {
+          isEmail: true
+        }
       },
       password: {
         type: Sequelize.STRING,
@@ -43,9 +50,6 @@ module.exports = {
       totalInvestment: {
         type: Sequelize.DECIMAL(10, 2),
         defaultValue: 0.0,
-      },
-      referralLink: {
-        type: Sequelize.STRING,
       },
       // Add other fields as required
       createdAt: {

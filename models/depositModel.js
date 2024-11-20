@@ -6,9 +6,19 @@ module.exports = (sequelize, DataTypes) =>{
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
+            unique: true,
+            allowNull:false
         },
         method : {
-            type: DataTypes.ENUM('btc','usdt', 'eth'),
+            type: DataTypes.ENUM,
+            values: ["btc","eth","usdt"],
+            defaultValue: 'usdt',
+            allowNull: false,
+        },
+        status: {
+            type: DataTypes.ENUM,
+            values: ["pending", "approved"],
+            defaultValue: 'pending',
             allowNull: false,
         },
         userId: {
@@ -19,12 +29,20 @@ module.exports = (sequelize, DataTypes) =>{
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
         },
+        euEquAmount: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: false,
+        },
         trxnId: {
             type: DataTypes.STRING,
             allowNull:false
         }
-    }, { timestamps: true });
+    }, { tableName: 'deposit',timestamps: true });
+
+    Deposit.associate = (models) =>{
+        Deposit.belongsTo(models.User, {foreignKey: 'userId', as: 'user'});
+    }
 
     return Deposit;
 }
-
+z

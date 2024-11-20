@@ -6,9 +6,19 @@ module.exports = (sequelize, DataTypes) =>{
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
             primaryKey: true,
+            allowNull: false,
+            unique: true
         },
         method : {
-            type: DataTypes.ENUM('btc', 'usdt'),
+            type: DataTypes.ENUM,
+            values: ["btc", "usdt"],
+            defaultValue: 'usdt',
+            allowNull: false,
+        },
+        status: {
+            type: DataTypes.ENUM,
+            values: ["pending", "approved"],
+            defaultValue: 'pending',
             allowNull: false,
         },
         userId: {
@@ -16,6 +26,10 @@ module.exports = (sequelize, DataTypes) =>{
             allowNull: false,
         },
         amount: {
+            type: DataTypes.DECIMAL(10, 2),
+            allowNull: false,
+        },
+        euEquAmount: {
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
         },
@@ -27,7 +41,11 @@ module.exports = (sequelize, DataTypes) =>{
             type: DataTypes.STRING,
             allowNull: false
         },
-    }, { timestamps: true });
+    }, {tableName: 'withdrawal', timestamps: true });
+
+    Withdrawal.associate = (models) =>{
+        Withdrawal.belongsTo(models.User, {foreignKey: 'userId', as: 'user'});
+    }
 
     return Withdrawal;
 }

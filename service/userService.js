@@ -33,7 +33,7 @@ const createUser = async ({ username, email, password,referralLink, country, ver
     return user;
 };
 
-const findUserByEmail = async() =>{
+const findUserByEmail = async({email}) =>{
     const user = await User.findOne({where: {email} });
 
     if(!user){

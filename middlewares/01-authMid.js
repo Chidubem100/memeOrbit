@@ -1,12 +1,26 @@
-const {attachCookieToRes,isTokenValid } = require("../../utils/jwt");
-const {UnauthenticatedApiError, UNAUTHORIZEDApiError} = require("../../Errors/index");
-const Utoken = require("../../models/token.model/uToken");
 const jwt = require("jsonwebtoken");
 
-const userAuthMiddleware = async(req,res,next) =>{
-    let {accesstoken, refresh_token} = req.headers
+async function authMiddleware(req,res,next)  {
+    const authHeader = req.headers['authorization'];
+    const accessToken = authHeader && authHeader.split(' ')[1];
 
-    if(!accesstoken && !refresh_token){
+    if(!accessToken){
+        return res.status(401).json({msg: "Unable To Login! Try again"})
+    }
+
+    jwt.verify(accessToken, 'secret', (err, user) =>{
+        if(err){
+            return res.status(402).json({msg: "Invalid accessToken"})
+        }
+        req.user = user;
+        next();
+    })
+}
+
+const userAuthMiddleware = async(req,res,next) =>{
+    let {accesstoken, refreshtoken} = req.headers
+
+    if(!accesstoken && !refreshtoken){
         return res.status(401)
             .json({msg:"Authentication failed. Please login"})
     }
@@ -14,10 +28,7 @@ const userAuthMiddleware = async(req,res,next) =>{
     try {
         
         if(accesstoken){      
-            if(!refresh_token){
-                return res.status(401)
-                        .json({msg:"Please login again!!"})
-            }  
+             
             const payload = jwt.verify(accesstoken,process.env.SECRET)
             
             req.user = payload;
@@ -49,4 +60,4 @@ const userAuthMiddleware = async(req,res,next) =>{
 }
 
 
-module.exports = userAuthMiddleware;
+module.exports = {authMiddleware, userAuthMiddleware};

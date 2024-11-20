@@ -1,10 +1,14 @@
 require("dotenv").config();
+require('express-async-errors');
 
 const express = require("express");
 const morgan = require("morgan");
 const cors =  require("cors");
 const path =  require("path")
 const authRouter = require("./routes/authRoute");
+const depositRouter = require("./routes/depositRoute");
+const withdrawalRouter = require("./routes/withdrawalRoute");
+const investmentRouter = require("./routes/investmentRoute");
 const app = express();
 
 const allowedOrigins = [  
@@ -26,7 +30,10 @@ app.use(morgan("dev"));
 
 // routes
 app.use('/api/v1/auth', authRouter);
-// app.use('/api/v1', );
+app.use('/api/v1/withdrawal', withdrawalRouter);
+app.use('/api/v1/deposit', depositRouter);
+app.use('/api/v1/investment', investmentRouter);
+
 
 app.get("/health-check", (req,res) =>{
     res.status(200).json({

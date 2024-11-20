@@ -3,6 +3,8 @@ const crypto = require('crypto');
 const {generateUniqueShortId, generateUniquieId} = require("../utils/generateId")
 const {isPasswordStrong} = require("../utils/passwordStrength");
 const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const createHash  = require("../utils/createHash");
 
 const signup = async (req, res) => {
     try {
@@ -24,7 +26,6 @@ const signup = async (req, res) => {
         
         const tokenUser = {
             userId: user.id,
-            // userId: user._id,
             username: user.username,
             email: user.email,
             country: user.country,
@@ -32,8 +33,8 @@ const signup = async (req, res) => {
         }
         let refresh_token = crypto.randomBytes(40).toString('hex');
 
-        const accessToken = jwt.sign(tokenUser, 'secret',{expiresIn:'1d'});
-        const refreshToken = jwt.sign({tokenUser,refresh_token}, process.env.SECRET,{expiresIn:'1d'});
+        const accessToken = jwt.sign(tokenUser, 'secret',{expiresIn:'1h'});
+        const refreshToken = jwt.sign({tokenUser,refresh_token}, 'secret',{expiresIn:'1h'});
         
         // send email from ceo
         // await sendCeoMail({username: username, email:email})
@@ -64,58 +65,48 @@ async function login(req,res){
     const {email,password} = req.body;
 
     if(!email||!password){
-        throw new BadRequestError('Please provide the need values');
+        return res.status(400).json({msg: "Provided the needed value(s)"})
     }
 
-    const user = await User.findOne({email});
+    const user = await userService.findUserByEmail({email})
     
     if(!user){
-        throw new NotFoundError(`User doesn't exist, Please sign up`);
+        return res.status(400).json({msg: `User doesn't exist, Please sign up`});
     }
-
-    if(user.isTempBanned){
-        throw new UnauthorizedError(`You can't login right now because you are temporarily banned from this app for breaking our policies.`)
-    }
-
-    const isPasswordCorrect = await user.comparePassword(password);
-    if(!isPasswordCorrect){
-        throw new BadRequestError(`Invalid password, check and try again`)
+   
+    const isMatch = await bcrypt.compare(password, user.password)
+    
+    if(!isMatch){
+       return res.status(400).json({msg: `Invalid Credentials! Try again`});
     }
 
     if(!user.isVerified){
-        throw new BadRequestError(`Please verify your email`)
+        return res.status(400).json({msg: "Verify your email address"});
     }
 
-    let refreshToken = '';
-
-    const existingToken = await Token.findOne({user: user._id});
-    if(existingToken){
-        const {isValid} = existingToken;
-        if(!isValid){
-            throw new UnauthorizedError('your are temporarily restricted from this app.')
-        }
-
-        refreshToken = existingToken.refreshToken;
-
-        const userToken = {username: user.username, email: user.email, role: user.role, userId: user._id};
-        attachCookiesToResponse({res, user:userToken, refreshToken});
-
-        res.status(StatusCodes.OK).json({success:true, user:userToken});
-        return;
+    
+    const tokenUser = {
+        userId: user.id,
+        username: user.username,
+        email: user.email,
+        country: user.country,
+        referralLink: user.referralLink,
     }
+    let refresh_token = '';
 
-    refreshToken = crypto.randomBytes(40).toString('hex');
+    refresh_token = crypto.randomBytes(40).toString('hex');
 
-    const userAgent = req.headers['user-agent']
-
-    const userT = {refreshToken,userAgent,user:user._id};
+    const accessToken = jwt.sign(tokenUser, 'secret',{expiresIn:'1h'});
+    const refreshToken = jwt.sign({tokenUser,refresh_token}, 'secret',{expiresIn:'1h'});
     
-    await Token.create(userT);
-    
-    const userToken = {username: user.username, email: user.email, role: user.role, userId: user._id};
-    attachCookiesToResponse({res, user:userToken, refreshToken});
-
-    res.status(StatusCodes.OK).json({success:true, user:userToken});
+    res.status(201).json({
+        success:true, 
+        username: user.username,
+        email: user.email,
+        userId: user.id,
+        accessToken,
+        refreshToken
+    });
 
 }
 
@@ -124,17 +115,17 @@ const verifyEmail = async(req,res) =>{
     const {email, verificationToken} = req.body;
 
     if(!email){
-        throw new BadRequestError('Please provide the needed values')
+        return res.status(400).json({msg: 'Please provide the needed value'}) 
     }
 
-    const user = await User.findOne({email});
+    const user = await userService.findUserByEmail({email});
 
     if(!user){
-        throw new UnauthenticatedError('Verification failed!');
+        return res.status(400).json({msg: 'User does not exist!'})
     }
 
     if(user.verificationToken !== verificationToken){
-        throw new UnauthenticatedError('Verification failed!!!');
+       return res.status(400).json({msg: 'Verification Token mismatch!!'}) 
     }
 
     user.isVerified = true,
@@ -143,34 +134,31 @@ const verifyEmail = async(req,res) =>{
 
     await user.save();
     
-    console.log(user)
-    res.status(200).json({msg: 'Email verified'});
+    return res.status(200).json({msg: 'Email verified'});
 }
 
 // reset password token
-
 const forgotPassword = async(req,res) =>{
     const {email} = req.body;
   
     if(!email){
-        throw new BadRequestError('Please provide a valid email address');
+        return res.status(400).json({msg: 'Please provide the needed value'})
     }
   
-    const user = await User.findOne({email});
+    const user = await userService.findUserByEmail({email});
 
-  
     if(user){
       const passwordResetToken = crypto.randomBytes(70).toString('hex');
   
       
   
-        const origin = 'http://localhost:3000'
-        await sendResetPasswordEmail({
-            name: user.name,
-            email: user.email,
-            token: passwordResetToken,
-            origin,
-        });
+        // const origin = 'http://localhost:3000'
+        // await sendResetPasswordEmail({
+        //     name: user.name,
+        //     email: user.email,
+        //     token: passwordResetToken,
+        //     origin,
+        // });
   
   
       const tenMins = 1000 * 60 * 10;
@@ -180,27 +168,27 @@ const forgotPassword = async(req,res) =>{
       user.passwordResetExpires = passwordResetExpires
   
       await user.save();
-        // res
-        //     .status(StatusCodes.OK)
-        //     .json({
-        //         user:user,
-        //         passwordResetToken
-        //     });
+        res
+            .status(200)
+            .json({
+                user:user,
+                passwordResetToken
+        });
     }
     res.status(200).json({msg: `Please check your email for rest password link`});
 }
 
 const resetPassword = async (req, res) => {
-    const { token, email, password, confirmPassword } = req.body;
-    if (!token || !email || !password, confirmPassword) {
-      throw new BadRequestError('Please provide all values')
+    const { token, email, password} = req.body;
+    if (!token || !email || !password) {
+        return res.status(400).json({msg: `Provide the needed value(s)`});
+    
     }
 
-    const user = await User.findOne({email});
+    const user = await userService.findUserByEmail({email});
 
     if (user) {
       const currentDate = new Date();
-        password === confirmPassword
         
         if(user.passwordResetToken === createHash(token) && user.passwordResetExpires > currentDate) {
 
@@ -220,5 +208,8 @@ const resetPassword = async (req, res) => {
 
 module.exports = {
     signup,
-    login
+    login,
+    verifyEmail,
+    forgotPassword,
+    resetPassword
 };

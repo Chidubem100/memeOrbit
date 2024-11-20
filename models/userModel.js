@@ -5,17 +5,24 @@ module.exports = (sequelize, DataTypes) => {
         id: {
             type: DataTypes.UUID,
             defaultValue: DataTypes.UUIDV4,
+            unique:true,
             primaryKey: true,
         },
         username: {
             type: DataTypes.STRING,
             allowNull: false,
+            validate: {
+                len: [2-30]
+            },
             unique: true,
         },
         email: {
             type: DataTypes.STRING,
             allowNull: false,
             unique: true,
+            validate: {
+                isEmail: true
+            }
         },
         password: {
             type: DataTypes.STRING,
@@ -40,9 +47,6 @@ module.exports = (sequelize, DataTypes) => {
         totalInvestment: {
             type: DataTypes.DECIMAL(10, 2),
             defaultValue: 0.0,
-        },
-        referralLink: {
-            type: DataTypes.STRING,
         },
         verificationToken: {
             type: DataTypes.STRING,
@@ -70,7 +74,14 @@ module.exports = (sequelize, DataTypes) => {
             defaultValue: 'user',
             allowNull: false,
         }
-    }, { timestamps: true });
+    }, { tableName: 'user',timestamps: true });
+
+    //association
+    User.associate = (models) =>{
+        User.hasMany(models.Investment, {foreignKey: 'userId', as: 'investment'});
+        User.hasMany(models.Withdrawal, {foreignKey: 'userId', as: 'withdrawal'});
+        User.hasMany(models.Deposit, {foreignKey: 'userId', as: 'deposit'});
+    }
 
     return User;
 };
