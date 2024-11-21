@@ -9,6 +9,7 @@ const authRouter = require("./routes/authRoute");
 const depositRouter = require("./routes/depositRoute");
 const withdrawalRouter = require("./routes/withdrawalRoute");
 const investmentRouter = require("./routes/investmentRoute");
+const userRouter = require("./routes/userRoute");
 const app = express();
 
 const allowedOrigins = [  
@@ -33,7 +34,7 @@ app.use('/api/v1/auth', authRouter);
 app.use('/api/v1/withdrawal', withdrawalRouter);
 app.use('/api/v1/deposit', depositRouter);
 app.use('/api/v1/investment', investmentRouter);
-
+app.use('/api/v1/user', userRouter);
 
 app.get("/health-check", (req,res) =>{
     res.status(200).json({
