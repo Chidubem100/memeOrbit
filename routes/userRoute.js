@@ -1,9 +1,10 @@
 const express = require('express');
-const userController = require('../controllers/userController');
-
+const {getAndUpdateDashboard} = require("../controllers/dashboard");
+const {authMiddleware, userAuthMiddleware} = require("../middlewares/01-authMid")
 const router = express.Router();
 
-// Signup route
-router.post('/signup', userController.signup);
+// 
+router.get('/dashboard', getAndUpdateDashboard);
+
 
 module.exports = router;

@@ -42,8 +42,8 @@ const findUserByEmail = async({email}) =>{
     return user;
 }
 
-const findUserById = async() =>{
-    const user = await User.findOne({where: {id} });
+const findUserById = async({userId}) =>{
+    const user = await User.findOne({where: {userId} });
 
     if(!user){
         throw new Error("User not found!")

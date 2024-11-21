@@ -1,31 +1,71 @@
-const {deposit} = require("../models");
+const {Deposit} = require("../models");
 
-const createdeposit = async({}) =>{
-
+const createdeposit = async({userId, method, status, amount, euEquAmount, trxnId}) =>{
+    try {
+        const deposit = await Deposit.create({
+            userId, amount, status, method,trxnId, euEquAmount
+        });
+        return deposit;
+    } catch (error) {
+        throw new Error("Error occurred", error.message)
+    }
 }
 
-const findAllDeposit = async({}) =>{
-
+const findAllDeposit = async() =>{
+    try {
+        const deposit = await Deposit.findAll({});
+        return deposit;
+    } catch (error) {
+        throw new Error("Error occurred", error.message)
+    }
 }
 
-const findDepositById = async({}) =>{
-
+const findDepositById = async({id}) =>{
+    try {
+        const deposit = await Deposit.findByPk(id);
+        if(!deposit) throw new Error("Deposit not found");
+        return deposit
+    } catch (error) {
+        throw new Error("Error occurred", error.message)
+    }
 }
 
-const findAllDepositForUser = async({}) =>{
-
+const findAllDepositForUser = async({userId}) =>{
+    try {
+        const deposit = await Deposit.findAll({where: {userId}});
+        return deposit;
+    } catch (error) {
+        throw new Error("Error occurred", error.message)
+    }
 }
 
-const findDepositByTrxId = async({}) =>{
-
+const findDepositByTrxId = async({trxnId}) =>{
+    try {
+        const deposit = await Deposit.findOne({where: {trxnId}});
+        if(!deposit) throw new Error("Deposit not found")
+        return deposit;
+    } catch (error) {
+        throw new Error("Error occurred", error.message)
+    }
 }
 
-const findAllAllApprovedDeposit = async({}) =>{
-
+const findAllAllApprovedDeposit = async() =>{
+    try {
+        const deposit = await Deposit.findAll({where: {status: 'approved'}})
+        return deposit;
+    } catch (error) {
+        throw new Error("Error occurred", error.message)
+        
+    }
 }
 
-const findAllAllPendingDeposit = async({}) =>{
-
+const findAllAllPendingDeposit = async() =>{
+    try {
+        const deposit =await Deposit.findAll({where: {status: 'pending'}});
+        return deposit
+    } catch (error) {
+        throw new Error("Error occurred", error.message)
+    }
 }
 
 module.exports = {
