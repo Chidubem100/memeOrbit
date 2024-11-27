@@ -23,9 +23,8 @@ module.exports = (sequelize, DataTypes) =>{
             type: DataTypes.DECIMAL(10, 2),
             allowNull: false,
         },
-        count: {
+        duration: {
             type: DataTypes.INTEGER,
-            defaultValue: 0,
             allowNull: false,
         },
         investmentId: {

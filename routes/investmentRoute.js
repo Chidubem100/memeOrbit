@@ -1,14 +1,22 @@
 const express = require('express');
-// const {
-//     fundWallet,
-//     getAllDeposit,
-//     getOneDeposit
-// } = require("../controllers/depositController");
+const {
+   createInvestment,
+   getAllInvestment,
+   getOneInvestment 
+} = require("../controllers/investmentController");
 const router = express.Router();
 
-// investment route
-// router.post('/fund-wallet', fundWallet);
-// router.get('/history', getAllDeposit);
-// router.get('/deposit-history/:id', getOneDeposit);
+const { userAuthMiddleware, authMiddleware} = require("../middlewares/01-authMid");
+
+
+// Create investment
+router.post("/create", createInvestment);
+
+// Get investment history
+router.get("/history", getAllInvestment);
+
+// Get single investment receipt
+router.get("/:investmentId", getOneInvestment);
 
 module.exports = router;
+

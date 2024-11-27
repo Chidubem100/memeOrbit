@@ -32,9 +32,9 @@ module.exports = {
         type: Sequelize.DECIMAL(10,2),
         allowNull: false,
       },
-      count: {
+      duration: {
         type: Sequelize.INTEGER,
-        defaultValue: 0,
+        defaultValue: 24,
         allowNull: false
       },
       investmentId: {

@@ -1,92 +1,86 @@
-const { Withdrawal } = require("../models");
+const { getDashboardData } = require("../service/dashboardService");
 
-const createWithdrawal = async ({ 
-    userId,
-    amount,
-    trxnId,
-    status,
-    method,
-    euEquAmount,
-    walletAdd,
-}) => {
+/**
+ * Controller for getting dashboard data.
+ * @param {Object} req - The request object.
+ * @param {Object} res - The response object.
+ */
+const getDashboard = async (req, res) => {
   try {
-    const withdrawal = await Withdrawal.create({
-      userId,
-      amount,
-      trxnId,
-      status,
-      method,
-      euEquAmount,
-      walletAdd    
+    const userId = req.user.id; // Extract user ID from authenticated request
+    const dashboardData = await getDashboardData(userId);
+
+    res.status(200).json({
+      success: true,
+      data: dashboardData,
     });
-    return withdrawal;
   } catch (error) {
-    throw new Error(`Error creating withdrawal: ${error.message}`);
+    console.error("Error in dashboard controller:", error.message);
+    res.status(500).json({
+      success: false,
+      error: error.message || "Internal Server Error",
+    });
   }
 };
 
-const findAllWithdrawal = async () => {
+module.exports = { getDashboard };
+
+
+const { User, Investment, Withdrawal, Deposit } = require("../models");
+
+/**
+ * Fetch user dashboard data.
+ * @param {string} userId - The ID of the user.
+ * @returns {Promise<Object>} - The dashboard data.
+ */
+const getDashboardData = async (userId) => {
   try {
-    const withdrawals = await Withdrawal.findAll({});
-    return withdrawals;
+    // Fetch user data
+    const user = await User.findByPk(userId, {
+      attributes: ["username", "walletBalance"],
+    });
+
+    if (!user) {
+      throw new Error("User not found");
+    }
+
+    // Fetch and sum total investment
+    const totalInvestment = await Investment.sum("amount", {
+      where: { userId },
+    });
+
+    // Fetch and sum total withdrawal
+    const totalWithdrawal = await Withdrawal.sum("amount", {
+      where: { userId },
+    });
+
+    // Fetch and sum total deposit
+    const totalDeposit = await Deposit.sum("amount", {
+      where: { userId },
+    });
+
+    // Fetch the most recent ongoing investment
+    const currentInvestment = await Investment.findOne({
+      where: { userId, status: "ongoing" },
+      order: [["createdAt", "DESC"]],
+      attributes: ["amount", "plan", "createdAt"],
+    });
+
+    // Return the dashboard data
+    return {
+      username: user.username,
+      walletBalance: user.walletBalance,
+      totalInvestment: totalInvestment || 0.0,
+      totalWithdrawal: totalWithdrawal || 0.0,
+      totalDeposit: totalDeposit || 0.0,
+      currentInvestment: currentInvestment || null,
+    };
   } catch (error) {
-    throw new Error(`Error finding all withdrawals: ${error.message}`);
+    console.error("Error fetching dashboard data:", error.message);
+    throw error;
   }
 };
 
-const findWithdrawalById = async ({ id }) => {
-  try {
-    const withdrawal = await Withdrawal.findByPk(id);
-    if (!withdrawal) throw new Error("Withdrawal not found");
-    return withdrawal;
-  } catch (error) {
-    throw new Error(`Error finding withdrawal by ID: ${error.message}`);
-  }
-};
+module.exports = { getDashboardData };
 
-const findAllWithdrawalForUser = async ({ userId }) => {
-  try {
-    const withdrawals = await Withdrawal.findAll({ where: { userId } });
-    return withdrawals;
-  } catch (error) {
-    throw new Error(`Error finding withdrawals for user: ${error.message}`);
-  }
-};
 
-const findWithdrawalByTrxId = async ({ trxId }) => {
-  try {
-    const withdrawal = await Withdrawal.findOne({ where: { trxId } });
-    if (!withdrawal) throw new Error("Withdrawal not found");
-    return withdrawal;
-  } catch (error) {
-    throw new Error(`Error finding withdrawal by transaction ID: ${error.message}`);
-  }
-};
-
-const findAllApprovedWithdrawal = async () => {
-  try {
-    const withdrawals = await Withdrawal.findAll({ where: { status: 'approved' } });
-    return withdrawals;
-  } catch (error) {
-    throw new Error(`Error finding approved withdrawals: ${error.message}`);
-  }
-};
-
-const findAllPendingWithdrawal = async () => {
-  try {
-    const withdrawals = await Withdrawal.findAll({ where: { status: 'pending' } });
-    return withdrawals;
-  } catch (error) {
-    throw new Error(`Error finding pending withdrawals: ${error.message}`);
-  }
-};
-
-module.exports = {
-  createWithdrawal,
-  findAllWithdrawal,
-  findWithdrawalById,
-  findAllWithdrawalForUser,
-  findWithdrawalByTrxId,
-  findAllApprovedWithdrawal,
-  findAllPendingWithdrawal,
-};
