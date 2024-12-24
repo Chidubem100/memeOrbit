@@ -168,14 +168,17 @@ const forgotPassword = async(req,res) =>{
       user.passwordResetExpires = passwordResetExpires
   
       await user.save();
-        res
-            .status(200)
-            .json({
-                user:user,
-                passwordResetToken
-        });
+        // res
+        //     .status(200)
+        //     .json({
+        //         user:user,
+        //         passwordResetToken
+        // });
+    }else{
+        res.status(200).json({msg: `Please check your email for rest password link`});
+
     }
-    res.status(200).json({msg: `Please check your email for rest password link`});
+    // res.status(200).json({msg: `Please check your email for rest password link`});
 }
 
 const resetPassword = async (req, res) => {

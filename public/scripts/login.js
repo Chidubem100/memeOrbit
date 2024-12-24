@@ -15,25 +15,20 @@ function setToken(val, expDur){
     localStorage.setItem('expires', expDur)
 }
 
-async function signupBtn(){
-    const usernamei = document.getElementById("usernameInput");
+async function loginFuction(){
     const emaili = document.getElementById("emailInput");
     const passwordi = document.getElementById("passwordInput");
-    const confirmPasswordi = document.getElementById("confirmPasswordInput");
-    const countryi = document.getElementById("countryInput");
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const formp = document.getElementById("form");
-    const btn = document.getElementById("sbtn");
+    const btn = document.getElementById("lbtn");
+
     // console.log(usernamei)
-    let usernameVal = usernamei.value;
     let emailVal = emaili.value;
     let passwordVal = passwordi.value;
-    let confirmPasswordVal = confirmPasswordi.value
-    let countryVal = countryi.value
+    
     clearErrors();
-    console.log(usernameVal)
+
     // validate inputs
-    if(!usernameVal || !emailVal || !passwordVal || !confirmPasswordVal || !countryVal){
+    if(!emailVal || !passwordVal){
         displayError('Please provide the needed value(s)')
         return;
     }
@@ -48,26 +43,16 @@ async function signupBtn(){
         return;
     }
 
-    if(passwordVal !== confirmPasswordVal){
-        displayError("Password and confirm password does not match")
-        return;
-    }
-
     const data = {
-        username: usernameVal,
         email: emailVal,
         password: passwordVal,
-        confirmPassword: confirmPasswordVal,
-        country: countryVal
     }
-    console.log("sign up btn reacting" + data.username)
 
     btn.textContent = 'Please wait.....';
     btn.disabled = true;
-    formp.disabled = true;
 
     try {
-        const response = await fetch(baseUrl+'signup', {
+        const response = await fetch(baseUrl+'login', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -77,12 +62,10 @@ async function signupBtn(){
         });
         if(!response.ok){
             const resp = await response.json(); 
-            console.log(resp.message)
-            displayError(resp.msg ||'Something went wrong');
+            displayError(resp.msg);
             
-            btn.textContent = 'Sign up';
+            btn.textContent = 'Login';
             btn.disabled = false;
-            formp.disabled = false;
             return;
         }
     
@@ -102,14 +85,12 @@ async function signupBtn(){
             // success modal
             window.location.href = "../dashboard/dashboard.html"
             
-            usernameVal = '',
             emailVal = '',
             passwordVal = '',
-            confirmPasswordVal = ''
+        
 
-            btn.textContent = 'Sign up';
+            btn.textContent = 'Login';
             btn.disabled = false;
-            formp.disabled = false;
            
             return  true;
         }else{
@@ -117,9 +98,8 @@ async function signupBtn(){
         }
     } catch (error) {
         console.log(error)    
-        btn.textContent = 'Sign up';
+        btn.textContent = 'Login';
         btn.disabled = false;
-        formp.disabled = false;
         displayError("Error occurred!!")
     }
 

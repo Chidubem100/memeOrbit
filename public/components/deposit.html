@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="UtTHWXdNtfXo0NVlQ54UN5dK7RYyFShsy5Y3sr6H">
     <link rel="shortcut icon" type="image/png" href="https://globe-asset.com/asset/theme3/images/icon/icon.png">
     <title>
-        Meme Orbit- Payment methods
+        deposit
     </title>
 
     <link rel="stylesheet" href="../asset/theme3/frontend/vendor/bootstrap-icons/bootstrap-icons.css">
@@ -202,7 +202,7 @@
                             </div>
                             <div class="payment-box-content">
                                 <h5 class="title">Etheruem</h5>
-                                <button data-id="32" class="btn bg-primary text-light w-100 paynow mt-3">Pay
+                                <button data-id="32" id="payBtn" class="btn bg-primary text-light w-100 paynow mt-3">Pay
                                     now</button>
                             </div>
                         </div>
@@ -216,7 +216,7 @@
                             </div>
                             <div class="payment-box-content">
                                 <h5 class="title">Bitcoin</h5>
-                                <button data-id="33" class="btn bg-primary text-light w-100 paynow mt-3">Pay
+                                <button data-id="33" id="payBtn" class="btn bg-primary text-light w-100 paynow mt-3">Pay
                                     now</button>
                             </div>
                         </div>
@@ -230,8 +230,9 @@
                             </div>
                             <div class="payment-box-content">
                                 <h5 class="title">Usdt</h5>
-                                <button data-id="34" class="btn bg-primary text-light w-100 paynow mt-3">Pay
-                                    now</button>
+                                <button data-id="34" class="btn bg-primary text-light w-100 paynow mt-3" id="payBtn">
+                                    Pay now
+                                </button>
                             </div>
                         </div>
                     </div>
@@ -241,7 +242,7 @@
 
             <div class="modal fade" tabindex="-1" role="dialog" id="paynow">
                 <div class="modal-dialog" role="document">
-                    <form action="" method="post">
+                    <form action="#" method="post">
                         <input type="hidden" name="_token" value="">
                         <div class="modal-content bg-body">
                             <div class="modal-header">
@@ -258,7 +259,7 @@
                                     <input type="hidden" name="id" value="">
                                     <div class="form-group">
                                         <label for="">Amount</label>
-                                        <input type="text" name="amount" class="form-control"
+                                        <input type="text" name="amount" id="amount" class="form-control"
                                             placeholder="Enter amount">
 
                                         <input type="hidden" name="user_id" class="form-control" value="408">
@@ -270,7 +271,7 @@
                             <div class="modal-footer">
                                 <button type="button" class="btn sp_btn_danger text-light"
                                     data-bs-dismiss="modal">Close</button>
-                                <button type="submit" class="btn bg-success text-light">Deposit now</button>
+                                <button type="button" class="btn bg-success text-light" onclick="depositBtn()" >Proceed</button>
                             </div>
                         </div>
                     </form>
@@ -311,6 +312,42 @@
                 modal.modal('show')
             })
         })
+    </script>
+
+    <script>
+        const payNowButtons = document.querySelectorAll("#payBtn");
+        const handleRoutingBasedOnHeading = (button) => {
+            const heading = button.closest(".payment-box-content").querySelector(".title").textContent;
+            localStorage.setItem("paymentMethod", heading);
+            // console.log(`Heading stored in localStorage: ${heading}`);
+        };
+        payNowButtons.forEach((button) => {
+                button.addEventListener("click", () => {
+                    handleRoutingBasedOnHeading(button);
+                });
+        });
+        async function depositBtn() {
+            let amountI =  document.getElementById("amount");
+            var amount = amountI.value;
+            if(!amount){
+                return;
+            }else{
+                localStorage.setItem("depositAmt", amount);
+                const method = localStorage.getItem("paymentMethod")
+                amount = "";
+                if (method == "Bitcoin") {
+                    window.location.href = "./btc-deposit-details.html"
+                
+                } else if(method == "Etheruem") {
+                    window.location.href = "./eth-deposit-details.html"
+                } else if(method == "Usdt") {
+                    window.location.href = "./usdt-deposit-details.html"
+                } else {
+                    return;
+                }
+                
+            }
+        }
     </script>
 
     <script src="../asset/theme3/frontend/js/all.js"></script>

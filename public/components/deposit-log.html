@@ -211,31 +211,29 @@
                                 <a class="tab-btn " href="./pending-deposit.html">Pending <span
                                         class="d-sm-inline-block d-none">Deposit</span></a>
 
-                                <a class="tab-btn " href="./compelete-deposit.html">Complete <span
+                                <a class="tab-btn " href="./complete-deposit.html">Complete <span
                                         class="d-sm-inline-block d-none">Deposit</span></a>
                             </div>
                         </div>
                         <div class="table-responsive">
-                            <table class="table site-table">
+                            <table class="table site-table" id="depositHistory">
                                 <thead>
                                     <tr>
-                                        <th>Trx</th>
                                         <th>Date</th>
-                                        <th>Method name</th>
-                                        <th>Deposit amount</th>
-                                        <th>Getable amount</th>
-                                        <th>Charge type</th>
-                                        <th>Charge</th>
+                                        <th>Trxn-Id</th>
+                                        <th>Method</th>
+                                        <th>Amount</th>
+                                        <th>Usd</th>
                                         <th>Status</th>
-                                        <th>Action</th>
+                                        
                                     </tr>
                                 </thead>
                                 <tbody>
-                                    <tr>
+                                    <!-- <tr>
                                         <td data-caption="Status" class="text-center" colspan="100%">
                                             No data found
                                         </td>
-                                    </tr>
+                                    </tr> -->
                                 </tbody>
                             </table>
                         </div>
@@ -290,6 +288,7 @@
         });
     </script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/moment.js/2.30.1/moment.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
 </body>
 

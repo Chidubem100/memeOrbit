@@ -61,6 +61,21 @@
         box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
     }
 
+    .error{
+        color: rgb(207, 22, 22);
+        margin-top: 5px;
+      font-size: 17px;
+      text-align: center;
+      text-transform: capitalize;
+    }
+    .success{
+        color: rgb(12, 56, 12);
+        margin-top: 5px;
+        font-size: 17px;
+        text-align: center;
+        text-transform: capitalize;
+    }
+
     .icard-header {
         background-color: #f8f9fa;
         padding: 15px;
@@ -115,7 +130,7 @@
     }
 </style>
 
-<body>
+<body onload="onloadWalletBalance()">
 
 
     <!-- ======= Header ======= -->
@@ -276,6 +291,9 @@
                 </div>
 
                 <div class="row gy-4">
+                    <div id="errorMsg" class="error"></div>
+                    <div id="successMsg" class="success"></div>
+
                     <div class="row gy-4">
                         <div class="col-xxl-8 col-lg-6">
                             <div class="site-card">
@@ -283,7 +301,7 @@
                                     <input type="hidden" name="_token" value="">
                                     <div class="card-header">
                                         <h5 class="mb-0">
-                                            Current balance: <span class="color-change">0.00 USD</span>
+                                            Current balance: <span class="color-change" id="walletBal"></span> <span class="color-change">USD</span>
                                         </h5>
                                     </div>
                                     <div class="card-body">
@@ -386,17 +404,9 @@
         <div class="col-md-12 mb-3 mt-3">
             <label for="">Withdraw amount <span class="sp_text_danger">*</span></label>
             <input type="text" name="amount" class="form-control amount" required="">
-            <p class="text-small color-change mb-0 mt-1"><span>Min amount &amp; 300.00usd</span> <span>Max amount 100,000.00usd</span></p>
+            <p class="text-small color-change mb-0 mt-1"><span>Min amount &amp; 1000.00usd</span> <span>Max amount 100,000.00usd</span></p>
         </div>
-        <div class="col-md-12 mb-3">
-            <label>Withdraw charge</label>
-            <div class="input-group">
-                <input type="text" class="form-control charge" value="0.00" required="" disabled="">
-                <div class="input-group-text">
-                    <span class="withdraw_charge_type">percent<span></span></span>
-                </div>
-            </div>
-        </div>
+        
         <div class="col-md-12 mb-3">
             <label for="">Final withdraw amount <span class="sp_text_danger">*</span></label>
             <input type="text" name="final_amo" class="form-control final_amo" required="" readonly="">
@@ -429,9 +439,15 @@
             cardHeader.addEventListener('click', function () {
                 // Toggle the active class for the card-body
                 cardBody.classList.toggle('active');
-            });
+            });                                 
         });
 
+    </script>
+
+    <script>
+        async function onloadWalletBalance() {
+            
+        }
     </script>
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
@@ -439,3 +455,4 @@
 </body>
 
 </html>
+

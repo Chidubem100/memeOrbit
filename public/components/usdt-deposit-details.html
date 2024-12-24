@@ -21,11 +21,27 @@
     <link rel="stylesheet" href="../asset/theme3/frontend/css/style.css">
     <link href="https://fonts.googleapis.com/icon?family=Material+Icons+Sharp" rel="stylesheet">
 
-
+    <style>
+        .error {
+            color: rgb(207, 22, 22);
+            margin-top: 5px;
+            font-size: 17px;
+            text-align: center;
+            text-transform: capitalize;
+        }
+    
+        .success {
+            color: rgb(12, 56, 12);
+            margin-top: 5px;
+            font-size: 17px;
+            text-align: center;
+            text-transform: capitalize;
+        }
+    </style>
 
 </head>
 
-<body>
+<body onload="loadConfirmation()">
 
 
     <!-- ======= Header ======= -->
@@ -185,6 +201,8 @@
                 </div>
 
                 <div class="row gy-4">
+                    <div id="errorMsg" class="error"></div>
+                    <div id="successMsg" class="success"></div>
 
                     <div class="col-xl-6 ">
                         <div class="site-card ">
@@ -212,7 +230,7 @@
                                     </li>
                                     <li class="list-group-item d-flex justify-content-between ">
                                         <span>Amount:</span>
-                                        <span>0.00 usdt</span>
+                                        <span id="depositAmt"></span>Eth
                                     </li>
 
                                     <li class="list-group-item d-flex justify-content-between ">
@@ -220,18 +238,18 @@
                                         <span>0.00 usdt</span>
                                     </li>
 
-                                    <li class="list-group-item d-flex justify-content-between ">
+                                    <!-- <li class="list-group-item d-flex justify-content-between ">
                                         <span>Conversion rate:</span>
                                         <span>1 USD = 1</span>
+                                    </li> -->
+
+                                    <li class="list-group-item d-flex justify-content-between ">
+                                        <span>Amount in usd:</span>
+                                        <span id="equAmt"></span><span>Usd</span>
                                     </li>
 
                                     <li class="list-group-item d-flex justify-content-between ">
-                                        <span>Total payable amount:</span>
-                                        <span>0 usdt</span>
-                                    </li>
-
-                                    <li class="list-group-item d-flex justify-content-between ">
-                                        <button class="btn bg-primary text-light mt-4 " type="submit ">Deposit
+                                        <button class="btn bg-primary text-light mt-4 " type="button" onclick="ethDeposit()">Deposit
                                             now</button>
                                     </li>
                                 </ul>
@@ -249,6 +267,24 @@
 
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
+    <script>
+        async function loadConfirmation() {
+            let depositAmtI = document.getElementById("depositAmt");
+            let equAmtI = document.getElementById("equAmt");
+            const amt = localStorage.getItem("depositAmt");
+
+            try {
+                
+                equAmtI.textContent = Number(amt).toFixed(8);
+                depositAmtI.textContent = Number(amt).toFixed(8);
+
+            } catch (error) {
+                console.log(error);
+                return;
+            }
+
+        }
+    </script>
 </body>
 
 </html>

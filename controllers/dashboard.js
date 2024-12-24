@@ -38,7 +38,7 @@ const getAndUpdateDashboard = async (req, res) => {
     const currentInvestment = await Investment.findOne({
       where: { userId, status: "ongoing" },
       order: [["createdAt", "DESC"]],
-      attributes: ["amount", "plan", "createdAt"],
+      attributes: ["amount"],
     });
 
     // Update the user model with calculated totals
@@ -52,11 +52,11 @@ const getAndUpdateDashboard = async (req, res) => {
       message: "Dashboard data retrieved successfully",
       data: {
         username: user.username,
-        walletBalance: user.walletBalance,
-        totalInvestment: user.totalInvestment,
-        totalWithdrawal: user.totalWithdrawal,
-        totalDeposit: user.totalDeposit,
-        currentInvestment: currentInvestment || null,
+        walletBalance: user.walletBalance || 0.00,
+        totalInvestment: user.totalInvestment || 0.00,
+        totalWithdrawal: user.totalWithdrawal || 0.00,
+        totalDeposit: user.totalDeposit || 0.00,
+        currentInvestment: currentInvestment || 0.00,
       },
     });
   } catch (error) {
