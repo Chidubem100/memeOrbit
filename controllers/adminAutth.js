@@ -5,10 +5,6 @@ const {isPasswordStrong} = require("../utils/passwordStrength");
 const jwt = require("jsonwebtoken");
 const bcrypt = require("bcrypt");
 const createHash  = require("../utils/createHash");
-const sendCeoMail = require("../utils/welcomeEmail");
-const sendVerificationEmail = require("../utils/verificationEmail");
-const sendResetPasswordEmail =  require("../utils/resetPasswordEmail");
-const origin = 'https://meme-orbit.com';
 
 const signup = async (req, res) => {
     try {
@@ -37,20 +33,20 @@ const signup = async (req, res) => {
         }
         let refresh_token = crypto.randomBytes(40).toString('hex');
 
-        const accessToken = jwt.sign(tokenUser, process.env.JWT_SECRET,{expiresIn:'1h'});
-        const refreshToken = jwt.sign({tokenUser,refresh_token}, process.env.JWT_SECRET,{expiresIn:'1h'});
+        const accessToken = jwt.sign(tokenUser, 'secret',{expiresIn:'1h'});
+        const refreshToken = jwt.sign({tokenUser,refresh_token}, 'secret',{expiresIn:'1h'});
         
         // send email from ceo
-        await sendCeoMail({username: username, email:email});
+        // await sendCeoMail({username: username, email:email})
 
-        // const origin = 'https://meme-orbit.com' // will still be changed
+        const origin = 'http://localhost:3000' // will still be changed
 
-        await sendVerificationEmail({
-            username: user.username,
-            email: user.email,
-            verificationToken: user.verificationToken,
-            origin
-        });
+        //  await sendVerificationEmail({
+        //        username: user.username,
+        //     email: user.email,
+        //     verificationToken: user.verificationToken,
+        //     origin
+        // });
     
         return res.status(201).json({ message: 'User created successfully',
             username: user.username,
@@ -100,8 +96,8 @@ async function login(req,res){
 
     refresh_token = crypto.randomBytes(40).toString('hex');
 
-    const accessToken = jwt.sign(tokenUser, process.env.JWT_SECRET,{expiresIn:'1h'});
-    const refreshToken = jwt.sign({tokenUser,refresh_token}, process.env.JWT_SECRET,{expiresIn:'1h'});
+    const accessToken = jwt.sign(tokenUser, 'secret',{expiresIn:'1h'});
+    const refreshToken = jwt.sign({tokenUser,refresh_token}, 'secret',{expiresIn:'1h'});
     
     res.status(201).json({
         success:true, 
@@ -157,6 +153,13 @@ const forgotPassword = async(req,res) =>{
       
   
         // const origin = 'http://localhost:3000'
+        // await sendResetPasswordEmail({
+        //     name: user.name,
+        //     email: user.email,
+        //     token: passwordResetToken,
+        //     origin,
+        // });
+  
   
       const tenMins = 1000 * 60 * 10;
       const passwordResetExpires = new Date(Date.now() + tenMins);
@@ -164,14 +167,6 @@ const forgotPassword = async(req,res) =>{
       user.passwordResetToken = createHash(passwordResetToken)
       user.passwordResetExpires = passwordResetExpires
   
-        await sendResetPasswordEmail({
-            username: user.username,
-            email: user.email,
-            token: passwordResetToken,
-            origin,
-        });
-
-
       await user.save();
         // res
         //     .status(200)

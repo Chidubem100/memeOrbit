@@ -1,10 +1,3 @@
-const {
-    createdeposit,
-    findAllDepositForUser,
-    findDepositById
-} = require("../service/depositServic");
-const { findUserById } = require("../service/userService");
-const sendDepositEmail = require("../utils/depositEmamil");
 const axios = require("axios");
 
 const getConversionRate = async (method) => {
@@ -41,15 +34,10 @@ const getConversionRate = async (method) => {
     return parseFloat(conversionRate);
 };
 
-const fundWallet = async (req, res) => {
+const handleDeposit = async (req, res) => {
     const { method, amount } = req.body;
-    const userId = req.user.id;
-    const user = await findUserById({userId})
-    try {
-        if(!user){
-            return res.status(404).json({error: " User not found!"})
-        }
 
+    try {
         // Validate method and amount
         if (!["btc", "eth", "usdt"].includes(method)) {
             return res.status(400).json({ error: "Invalid deposit method" });
@@ -70,21 +58,10 @@ const fundWallet = async (req, res) => {
             return res.status(400).json({ error: "Minimum deposit is 300 USDT" });
         }
 
-        const trxnId = `WD-${Date.now()}`;
-        const deposit = await createdeposit({userId, method, status:"pending", amount, euEquAmount, trxnId})
-
-        await sendDepositEmail({
-            email: user.email,
-            username: user.username,
-            method: method,
-            amount: amount,
-        });
-
         // If the deposit is valid
         return res.status(200).json({
             message: "Deposit successful",
             convertedAmount: usdtEquivalentAmount.toFixed(2),
-            data: deposit,
             currency: "USDT",
         });
 
@@ -94,40 +71,4 @@ const fundWallet = async (req, res) => {
     }
 };
 
-
-// deposit history
-async function getAllDeposit(req,res) {
-    try {
-        const userId = req.user.id;
-        const deposit = findAllDepositForUser({userId});
-
-        if(!deposit || deposit.length === 0){
-            return res.status(404).json({msg: "No deposit found"})
-        }
-        res.status(200).json({deposit});
-    } catch (error) {
-        console.error(error);
-        res.status(500).json({ error: error.message });
-    }
-}
-
-// deposit receipt
-async function getOneDeposit(req,res) {
-    try {
-        const {depositId} = req.params;
-        const deposit =  await findDepositById({id: depositId});
-        if(!deposit){
-            return res.status(404).json({error: "No deposit history found"})
-        }
-        res.status(200).json({deposit})
-    } catch (error) {
-         console.error(error);
-        res.status(500).json({ error: error.message });
-    }
-}
-
-module.exports = {
-    fundWallet,
-    getAllDeposit,
-    getOneDeposit
-}
+module.exports = { handleDeposit };

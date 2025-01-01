@@ -8,7 +8,7 @@ async function authMiddleware(req,res,next)  {
         return res.status(401).json({msg: "Unable To Login! Try again"})
     }
 
-    jwt.verify(accessToken, process.env.JWT_SECRET, (err, user) =>{
+    jwt.verify(accessToken, 'secret', (err, user) =>{
         if(err){
             return res.status(402).json({msg: "Invalid accessToken"})
         }
@@ -29,14 +29,14 @@ const userAuthMiddleware = async(req,res,next) =>{
         
         if(accesstoken){      
              
-            const payload = jwt.verify(accesstoken,process.env.JWT_SECRET)
+            const payload = jwt.verify(accesstoken,process.env.SECRET)
             
             req.user = payload;
            return  next()
         }
         
         if(!accesstoken){
-        const payload = jwt.verify(process.env.JWT_SECRET);
+        const payload = jwt.verify(refresh_token, process.env.SECRET);
         
         const existingToken = await Utoken.findOne({
             user:payload.tokenUser.userId,

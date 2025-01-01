@@ -1,126 +1,115 @@
 const baseUrl = "/api/v1/auth/";
 
-function clearErrors(){
+function clearErrors() {
     const errMsg = document.getElementById('error-message');
-    console.log(errMsg)
-    errMsg.textContent = ''
+    errMsg.textContent = '';
 }
-function displayError(msg){
+
+function displayError(msg) {
     const errMsg = document.getElementById("error-message");
-    errMsg.innerHTML += `<p class="text-center lead mb-4" >${msg}</p>`
-    setTimeout(clearErrors, 7000)
-}
-function setToken(val, expDur){
-    localStorage.setItem('accessToken', val)
-    localStorage.setItem('expires', expDur)
+    errMsg.innerHTML += `<p class="text-center lead mb-4">${msg}</p>`;
+    setTimeout(clearErrors, 7000);
 }
 
-async function signupBtn(){
-    const usernamei = document.getElementById("usernameInput");
-    const emaili = document.getElementById("emailInput");
-    const passwordi = document.getElementById("passwordInput");
-    const confirmPasswordi = document.getElementById("confirmPasswordInput");
-    const countryi = document.getElementById("countryInput");
+function showSuccessModal() {
+    const modal = document.getElementById("success-modal");
+    modal.style.display = "block";
+
+    const okayButton = document.getElementById("modal-ok-btn");
+    okayButton.addEventListener("click", () => {
+        modal.style.display = "none"; // Close the modal
+        window.location.href = "../pages/login.html"; // Redirect to login page
+    });
+}
+
+async function signupBtn() {
+    const usernameInput = document.getElementById("usernameInput");
+    const emailInput = document.getElementById("emailInput");
+    const passwordInput = document.getElementById("passwordInput");
+    const confirmPasswordInput = document.getElementById("confirmPasswordInput");
+    const countryInput = document.getElementById("countryInput");
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    const formp = document.getElementById("form");
+    const form = document.getElementById("form");
     const btn = document.getElementById("sbtn");
-    // console.log(usernamei)
-    let usernameVal = usernamei.value;
-    let emailVal = emaili.value;
-    let passwordVal = passwordi.value;
-    let confirmPasswordVal = confirmPasswordi.value
-    let countryVal = countryi.value
+
+    let username = usernameInput.value.trim();
+    let email = emailInput.value.trim();
+    let password = passwordInput.value;
+    let confirmPassword = confirmPasswordInput.value;
+    let country = countryInput.value;
+
     clearErrors();
-    console.log(usernameVal)
-    // validate inputs
-    if(!usernameVal || !emailVal || !passwordVal || !confirmPasswordVal || !countryVal){
-        displayError('Please provide the needed value(s)')
+
+    if (!username || !email || !password || !confirmPassword || !country) {
+        displayError('Please provide the needed value(s)');
         return;
     }
 
-    if(!emailRegex.test(emailVal)){
-        displayError('Email is not valid!')
+    if (!emailRegex.test(email)) {
+        displayError('Email is not valid!');
         return;
     }
 
-    if(passwordVal.length < 8){
-        displayError('Password should be at least 8 characters')
+    if (password.length < 8) {
+        displayError('Password should be at least 8 characters');
         return;
     }
 
-    if(passwordVal !== confirmPasswordVal){
-        displayError("Password and confirm password does not match")
+    if (password !== confirmPassword) {
+        displayError("Password and confirm password do not match");
         return;
     }
 
     const data = {
-        username: usernameVal,
-        email: emailVal,
-        password: passwordVal,
-        confirmPassword: confirmPasswordVal,
-        country: countryVal
-    }
-    console.log("sign up btn reacting" + data.username)
+        username,
+        email,
+        password,
+        confirmPassword,
+        country
+    };
 
-    btn.textContent = 'Please wait.....';
+    btn.textContent = 'Please wait...';
     btn.disabled = true;
-    formp.disabled = true;
+    form.disabled = true;
 
     try {
-        const response = await fetch(baseUrl+'signup', {
+        const response = await fetch(baseUrl + 'signup', {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
+            headers: { 'Content-Type': 'application/json' },
             body: JSON.stringify(data),
             credentials: 'include'
         });
-        if(!response.ok){
-            const resp = await response.json(); 
-            console.log(resp.message)
-            displayError(resp.msg ||'Something went wrong');
-            
+
+        if (!response.ok) {
+            const resp = await response.json();
+            displayError(resp.msg || 'Something went wrong');
             btn.textContent = 'Sign up';
             btn.disabled = false;
-            formp.disabled = false;
+            form.disabled = false;
             return;
         }
-    
-        if(response.ok){
-            const resp = await response.json();
 
-            const accessToken = resp.accessToken;
-            const refreshToken = resp.refreshToken;
+        const resp = await response.json();
 
-            const expiraionTime = new Date();
-            expiraionTime.setTime(expiraionTime.getTime() + (1 * 24 *60 * 60))
+        // Show success modal
+        showSuccessModal();
 
-            
-            document.cookie = `accessToken=${accessToken}; expires=${expiraionTime.toUTCString()}; path=/; `;
-            document.cookie = `refreshToken=${refreshToken}; expires=${expiraionTime.toUTCString()}; path=/; `;
-            
-            // success modal
-            window.location.href = "../dashboard/dashboard.html"
-            
-            usernameVal = '',
-            emailVal = '',
-            passwordVal = '',
-            confirmPasswordVal = ''
+        // Clear form inputs
+        usernameInput.value = '';
+        emailInput.value = '';
+        passwordInput.value = '';
+        confirmPasswordInput.value = '';
+        countryInput.value = '';
 
-            btn.textContent = 'Sign up';
-            btn.disabled = false;
-            formp.disabled = false;
-           
-            return  true;
-        }else{
-            return false;
-        }
-    } catch (error) {
-        console.log(error)    
         btn.textContent = 'Sign up';
         btn.disabled = false;
-        formp.disabled = false;
-        displayError("Error occurred!!")
-    }
+        form.disabled = false;
 
+    } catch (error) {
+        console.error(error);
+        displayError("An error occurred!");
+        btn.textContent = 'Sign up';
+        btn.disabled = false;
+        form.disabled = false;
+    }
 }

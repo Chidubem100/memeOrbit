@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const nodemailerConfig = require("../config/nodemailer.config");
+// const nodemailerConfig = require("../config/nodemailer.config");
 
 const sendEmail = ({to,subject,html}) =>{
 
@@ -15,7 +15,7 @@ const sendEmail = ({to,subject,html}) =>{
     // transporter.sendMail
     
     return transporter.sendMail({
-        from: 'Neo cloud',
+        from: 'Meme-Orbit',
         to,
         subject,
         html,

@@ -6,14 +6,46 @@ const {
 const {findUserById} = require("../service/userService");
 const {findMostRecentInvestment} = require("../service/investmentService");
 const axios = require("axios");
+const sendWithdrawalEmail = require("../utils/wthEmail");
+const { userAuthMiddleware } = require("../middlewares/01-authMid");
+
+const getConversionRate = async (method) => {
+    let apiEndpoint;
+
+    // Define API endpoints for each currency
+    switch (method) {
+        case "btc":
+            apiEndpoint = "https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd"; // Replace with a BTC-to-USD API if needed
+            break;
+        case "usdt":
+            apiEndpoint = "https://api.coingecko.com/api/v3/simple/price?ids=usdt&vs_currencies=usd"; // Replace with an appropriate USDT-to-USD API
+            break;
+        default:
+            throw new Error("Invalid deposit method");
+    }
+
+    // Fetch conversion rate
+    const response = await axios.get(apiEndpoint);
+
+    // Extract conversion rate based on API response structure
+    let conversionRate;
+    if (method === "btc") {
+        conversionRate = response.data.bitcoin.usd; // Adjust based on the API's BTC response structure
+    } else if (method === "usdt") {
+        conversionRate = 1; // USDT is pegged to USD
+    }
+
+    return parseFloat(conversionRate);
+};
 
 // request withdrawal
 async function requestWithdrawal(req,res) {
+    const userId = req.user.id;
+    const {amount, method, walletAdd} = req.body;
+    const user = await findUserById({userId});
+    const recentInvestment = await findMostRecentInvestment({userId})
+    
     try {
-        const userId = req.user.id;
-        const {amount, method, walletAdd} = req.body;
-        const user = await findUserById({userId});
-        const recentInvestment = await findMostRecentInvestment({userId})
 
         if(!amount||!method||!walletAdd){
             return res.status(404).json({error: "Please provide the needed value(s)"})
@@ -23,15 +55,31 @@ async function requestWithdrawal(req,res) {
             return res.status(404).json({error: "User not found!"})
         }
 
-        // if(!user.walletBalance < amount){
-        //     return res.status(400).json({ error: "Insufficient wallet balance" });
-
-        // }
-
+        // Validate method and amount
+        if (!["btc", "usdt"].includes(method)) {
+            return res.status(400).json({ error: "Invalid withdrawal method" });
+        }
+    
         if(!recentInvestment){
             return res.status(400).json({ error: "No recent Investment" });
         }
 
+        if (!amount || isNaN(amount)) {
+            return res.status(400).json({ error: "Invalid amount" });
+        }
+
+        // Get the conversion rate
+        const conversionRate = await getConversionRate(method);
+
+        // Convert the deposit amount to USDT
+        const usdtEquivalentAmount = parseFloat(amount) * conversionRate;
+
+        if (usdtEquivalentAmount > user.walletBalance) {
+             return res.status(400).json({
+            error: "Insufficient wallet balance for the EUR equivalent amount.",
+            });
+        }
+        
         const plan = recentInvestment.plan;
         const maxWithdrawalLimits = {
             basic: 100,
@@ -39,43 +87,35 @@ async function requestWithdrawal(req,res) {
             boom: Infinity,
         }
 
-        if(amount > maxWithdrawalLimits[plan]){
-            const nextPlan = plan === "moon" ? "basic plan" : "boom plan";
+        if(usdtEquivalentAmount > maxWithdrawalLimits[plan]){
+            const nextPlan = plan === "moon plan" ? "basic plan" : "boom plan";
             return res.status(400).json({
                 error: `Upgrade to the ${nextPlan} to process this withdrawal amount.`,
             });
         }
 
-        // Fetch EUR equivalent using API
-        const apiEndpoint =
-            method === "btc"
-            ? "https://api.coindesk.com/v1/bpi/currentprice/EUR.json"
-            : "https://api.example.com/usdt-to-eur"; // Replace with an appropriate USDT-to-EUR API
-        const response = await axios.get(apiEndpoint);
+        
 
-        // Calculate EUR equivalent
-        const conversionRate =
-        method === "btc"
-            ? response.data.bpi.EUR.rate_float
-            : response.data.eur_conversion_rate; // Adjust based on API response structure
-        const euEquAmount = parseFloat(amount) * parseFloat(conversionRate);
-
-        // if (user.walletBalance < euEquAmount) {
-        //      return res.status(400).json({
-        //     error: "Insufficient wallet balance for the EUR equivalent amount.",
-        //     });
-        // }
+        
 
     // Deduct EUR equivalent from user's wallet
-    user.walletBalance -= euEquAmount;
+    user.walletBalance -= usdtEquivalentAmount;
     await user.save();
 
     const trxnId = `WD-${Date.now()}`;
     const withdrawal = await createWithdrawal({
-        userId, amount, trxnId,method, euEquAmount, walletAdd, status:"pending"
+        userId, amount, trxnId,method, euEquAmount:usdtEquivalentAmount, walletAdd, status:"pending"
     });
 
-    res.status(200).json({
+    await sendWithdrawalEmail({
+        email: user.email,
+        username: user.username,
+        method: method,
+        amount: amount,
+        status: "Pending"
+    });
+
+    return res.status(200).json({
       message: "Withdrawal request submitted successfully.",
       withdrawal,
     });

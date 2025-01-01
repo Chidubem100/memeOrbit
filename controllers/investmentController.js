@@ -25,7 +25,7 @@ async function createInvestment(req,res) {
     }
 
     if(!plans || !amount){
-        return res.status(400).json({ message: "Please provide the needed value(s)." });
+        return res.status(400).json({ message: "Please provide the needed value(s)" });
     }
 
     // Determine the duration based on the plan

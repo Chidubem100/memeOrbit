@@ -10,13 +10,13 @@ const { userAuthMiddleware, authMiddleware} = require("../middlewares/01-authMid
 
 
 // Create investment
-router.post("/create", createInvestment);
+router.post("/create", authMiddleware,createInvestment);
 
 // Get investment history
-router.get("/history", getAllInvestment);
+router.get("/history", authMiddleware,getAllInvestment);
 
 // Get single investment receipt
-router.get("/:investmentId", getOneInvestment);
+router.get("/:investmentId", authMiddleware,getOneInvestment);
 
 module.exports = router;
 

@@ -214,12 +214,16 @@
                             class="bi bi-shield-lock"></i> Change password</a>
                 </div>
                 <div class="site-card">
+                    <div id="errorMsg" class="error"></div>
+                    <div id="successMsg" class="success"></div>
+
                     <div class="card-body">
-                        <form action="" method="POST" enctype="multipart/form-data">
+                        
+                        <form action="#" method="POST" enctype="multipart/form-data">
                             <input type="hidden" name="_token" value="">
                             <div class="row gy-4 justify-content-center">
-                                <div class="col-md-4 pe-lg-5 pe-md-4 justify-content-center">
-                                    <div class="img-choose-div">
+                                <!-- <div class="col-md-4 pe-lg-5 pe-md-4 justify-content-center"> -->
+                                    <!-- <div class="img-choose-div">
                                         <p>Profile picture</p>
 
                                         <img class=" rounded file-id-preview w-100" id="file-id-preview" src=""
@@ -230,35 +234,35 @@
 
                                         <label for="imageUpload" class="editImg btn main-btn w-100 gen-btn">Choose
                                             file</label>
-                                    </div>
-                                </div>
+                                    </div> -->
+                                <!-- </div> -->
                                 <div class="col-md-8">
                                     <div class="update">
                                         <div class="mb-3">
                                             <label>First name</label>
-                                            <input type="text" class="form-control" name="fname" value=""
+                                            <input type="text" id="fN" class="form-control" name="fname" value=""
                                                 placeholder="Enter first name">
                                         </div>
                                         <div class="mb-3">
                                             <label>Last name</label>
-                                            <input type="text" class="form-control" name="lname" value=""
+                                            <input type="text" id="lN" class="form-control" name="lname" value=""
                                                 placeholder="Enter last name">
                                         </div>
                                         <div class="mb-3">
                                             <label>Username</label>
-                                            <input type="text" class="form-control text-white" name="username"
-                                                value="samuelxz" placeholder="Enter user name">
+                                            <input type="text" id="uN" class="form-control text-white" name="username"
+                                                placeholder="Enter user name">
                                         </div>
                                     </div>
                                     <div class="mb-3">
                                         <label>Email address</label>
-                                        <input type="email" class="form-control" name="email" value=""
+                                        <input type="email" id="eA" class="form-control" name="email" value=""
                                             placeholder="Enter email">
                                     </div>
 
                                     <div class="mb-3">
                                         <label>Phone</label>
-                                        <input type="text" class="form-control" name="phone" value=""
+                                        <input type="text" id="pN" class="form-control" name="phone" value=""
                                             placeholder="Enter phone">
                                     </div>
 
@@ -267,33 +271,33 @@
 
                                         <div class="form-group col-md-6 mb-3 ">
                                             <label>Country</label>
-                                            <input type="text" name="country" class="form-control" value="">
+                                            <input type="text" id="cN" name="country" class="form-control" value="">
                                         </div>
 
                                         <div class="col-md-6 mb-3">
 
                                             <label>City</label>
-                                            <input type="text" name="city" class="form-control form_control" value="">
+                                            <input type="text" id="cT" name="city" class="form-control form_control" value="">
 
                                         </div>
 
                                         <div class="col-md-6 mb-3">
 
                                             <label>Zip</label>
-                                            <input type="text" name="zip" class="form-control form_control" value="">
+                                            <input type="text" id="zP"  name="zip" class="form-control form_control" value="">
 
                                         </div>
 
                                         <div class="col-md-6 mb-3">
 
                                             <label>State</label>
-                                            <input type="text" name="state" class="form-control form_control" value="">
+                                            <input type="text" id="sT" name="state" class="form-control form_control" value="">
 
                                         </div>
 
                                     </div>
 
-                                    <button class="btn main-btn mt-3 w-100 gen-btn">Update</button>
+                                    <button type="button" class="btn main-btn mt-3 w-100 gen-btn" onclick="submitBtn()">Submit</button>
                                 </div>
                         </form>
                     </div>
@@ -360,6 +364,60 @@
             $('.d-sidebar').toggleClass('active');
         });
     </script>
+    <script src="../scripts/main.js"></script>
+
+    <script>
+        function clearErrors() {
+                const errMsg = document.getElementById('errorMsg');
+                errMsg.textContent = '';
+        }
+
+        function displayError(msg) {
+                const errMsg = document.getElementById("errorMsg");
+                errMsg.innerHTML += `<p class="text-center lead mb-4" >${msg}</p>`
+                setTimeout(clearErrors, 5000)
+        }
+        function displaysuccess(msg) {
+                const errMsg = document.getElementById("successMsg");
+                errMsg.innerHTML += `<p class="text-center lead mb-4" >${msg}</p>`
+                setTimeout(clearErrors, 5000)
+
+        }
+        async function submitBtn(){
+            const fnInput = document.getElementById("fN");
+            const lnInput = document.getElementById("lN");
+            const unInput = document.getElementById("uN");
+            const eaInput = document.getElementById("eA");
+            const pnInput = document.getElementById("pN");
+            const cNInput = document.getElementById("cN");
+            const ctInput = document.getElementById("cT");
+            const zpInput = document.getElementById("zP");
+            const stInput = document.getElementById("sT");
+
+            if(!fnInput.value || 
+                !lnInput.value || 
+                !unInput.value || 
+                !eaInput.value || 
+                !pnInput.value || 
+                !cNInput.value ||
+                !ctInput.value ||
+                !zpInput.value ||
+                !stInput.value 
+            ){
+                displayError("Provide the needed value(s)")
+            }
+
+            if(await isAuthenticated()){
+
+                displaysuccess("Your details have been updated successfully!!");
+                window.location.href =  "../dashboard/dashboard.html"
+
+            }else{
+                redirectToLogin()
+            }
+        }
+    </script>
+
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
 </body>

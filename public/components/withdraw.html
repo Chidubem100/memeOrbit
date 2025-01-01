@@ -7,7 +7,7 @@
     <meta name="csrf-token" content="IfWRu0HK90uM6YkSq7z5G5SwBfXHdETgd9iHTZaf">
     <meta property="og:type" content="website">
     <title>
-        Meme Orbit- Withdraw money
+        Meme Orbit- Withdrawal
     </title>
 
     <link rel="stylesheet" href="../asset/theme3/frontend/vendor/bootstrap-icons/bootstrap-icons.css">
@@ -309,10 +309,9 @@
                                             <label for="withdraw-method">Withdraw method</label>
                                             <div class="custom-select-container">
                                                 <select name="method" id="withdraw-method" class="select">
-                                                    <option value="" selected>Select method</option>
-                                                    <option value="3">Bitcoin</option>
-                                                    <option value="2">Ethereum</option>
-                                                    <option value="1">USDT (trc20)</option>
+                                                    <option id="main-sel" value="" selected>Select method</option>
+                                                    <option value="btc">Bitcoin</option>
+                                                    <option value="usdt">USDT (trc20)</option>
                                                 </select>
                                             </div>
                                         </div>
@@ -395,7 +394,7 @@
         });
     </script>
 
-    <script>
+    <!-- <script>
         document.addEventListener("DOMContentLoaded", function () {
             const selectElement = document.querySelector('select[name="method"]');
             const appendDataContainer = document.querySelector('.appendData');
@@ -403,20 +402,20 @@
             const additionalFields = `
         <div class="col-md-12 mb-3 mt-3">
             <label for="">Withdraw amount <span class="sp_text_danger">*</span></label>
-            <input type="text" name="amount" class="form-control amount" required="">
-            <p class="text-small color-change mb-0 mt-1"><span>Min amount &amp; 1000.00usd</span> <span>Max amount 100,000.00usd</span></p>
+            <input type="text" name="amount" id="wthAmount" class="form-control amount" required="">
+            <p class="text-small color-change mb-0 mt-1"><span>Min amount 1000.00 usd</span> <span>Max amount 100,000.00 usd</span></p>
         </div>
         
         <div class="col-md-12 mb-3">
             <label for="">Final withdraw amount <span class="sp_text_danger">*</span></label>
-            <input type="text" name="final_amo" class="form-control final_amo" required="" readonly="">
+            <input type="text" name="final_amo" id="finalWthAmount" class="form-control final_amo" required="" readonly="">
         </div>
         <div class="col-md-12 mb-3">
             <label for="">Wallet address <span class="sp_text_danger">*</span></label>
-            <input type="text" name="email" class="form-control" required="">
+            <input type="text" name="email" id="walletAdd" class="form-control" required="">
         </div>
         <div class="col-md-12">
-            <button class="btn main-btn plan-btn w-100" type="submit">Withdraw now</button>
+            <button id="submitBtn" onSubmit="withBtn()" class="btn main-btn plan-btn w-100" type="button">Withdraw now</button>
         </div>
     `;
 
@@ -442,14 +441,50 @@
             });                                 
         });
 
-    </script>
-
+    </script> -->
+    <script src="../scripts/main.js"></script>
     <script>
         async function onloadWalletBalance() {
+            let walletBalI = document.getElementById("walletBal"); 
             
+            if (await isAuthenticated()) {
+                const accessToken = getCookie("accessToken")
+                const refreshToken = getCookie("refreshToken")
+
+                try {
+
+                    const response = await fetch("/api/v1/user/dashboard", {
+                        method: 'GET',
+                        mode: 'cors',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'AccessToken': accessToken,
+                            'Refresh_Token': refreshToken,
+                        },
+                        credentials: 'include',
+                    });
+
+
+                    const data = await response.json();
+
+                    const {
+                        walletBalance,
+                    } = data.data;
+
+                    walletBalI.textContent = walletBalance
+
+                }catch (error) {
+                    console.log(error)
+                    return error;
+                }
+            } else {
+                redirectToLogin();
+            }
+
         }
     </script>
-
+    <!-- <script src="../scripts/main.js"></script> -->
+    <script src="../scripts/withdrawal.js"></script>
     <script src="https://code.jquery.com/jquery-3.6.4.min.js"></script>
     <script src="https://unpkg.com/feather-icons"></script>
 </body>

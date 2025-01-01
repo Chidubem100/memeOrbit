@@ -1,6 +1,5 @@
 const baseUrl = "/api/v1/user/dashboard";
 
-
 async function dashboard(){
     let walletBalI = document.getElementById("accBalance");
     let currentInvestI = document.getElementById("currentInvest");
@@ -57,7 +56,7 @@ async function dashboard(){
             walletBalI.textContent = walletBalance,
             totalDepoI.textContent = totalDeposit,
             totalInvestI.textContent = totalInvestment,
-            totalWithI.textContent = totalWithdrawal
+            totalWithI.textContent = totalWithdrawal,
             currentInvestI.textContent = currentInvestment
             
             

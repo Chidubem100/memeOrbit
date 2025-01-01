@@ -7,6 +7,55 @@
   <title>Signup</title>
   <link rel="stylesheet" href="../asset/theme3/frontend/css/validation-styles.css">
   <!-- <script type="text/javascript" src="validation.js" defer></script> -->
+  <style>
+      .modal {
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background-color: rgba(0, 0, 0, 0.5);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  }
+  
+  .modal-content {
+  background: #fff;
+  padding: 20px;
+  border-radius: 8px;
+  text-align: center;
+  }
+  
+  .modal-content button {
+  margin-top: 20px;
+  }
+
+  #modal-ok-btn {
+    background-color: #004aad; /* Green color */
+    color: white; /* Text color */
+    font-size: 16px; /* Font size */
+    font-weight: bold; /* Bold text */
+    padding: 12px 20px; /* Padding for a button size */
+    border: none; /* Remove default border */
+    border-radius: 8px; /* Rounded corners */
+    cursor: pointer; /* Pointer cursor on hover */
+    box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1); /* Subtle shadow */
+    transition: all 0.3s ease; /* Smooth hover effect */
+}
+
+#modal-ok-btn:hover {
+    background-color: #004aad; /* Darker green on hover */
+    box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2); /* Enhance shadow on hover */
+}
+
+#modal-ok-btn:active {
+    background-color: #004aad; /* Even darker green on click */
+    transform: scale(0.98); /* Slightly shrink button on click */
+    box-shadow: 0 3px 5px rgba(0, 0, 0, 0.2); /* Reduced shadow on click */
+}
+
+  </style>
 </head>
 
 <body>
@@ -59,6 +108,13 @@
       <button id="sbtn" type="button" onclick="signupBtn()">Signup</button>
     </form>
     <p>Already have an Account? <a href="login.html">login</a> </p>
+  </div>
+  <div id="success-modal" class="modal" style="display: none;">
+    <div class="modal-content">
+      <h2>Success!</h2>
+      <p>Account created successfully. Please check your email to verify your account.</p>
+      <button id="modal-ok-btn" class="btn btn-primary">Okay</button>
+    </div>
   </div>
 
   <script src="../scripts/signup.js"></script>

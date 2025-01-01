@@ -6,7 +6,7 @@
     <meta content="width=device-width, initial-scale=1.0" name="viewport">
     <meta name="csrf-token" content="PYhlAyW783R2OzCBoitt01PREZFOlfGXHgOZPj0t">
     <title>
-        Dashboard
+        Menu
     </title>
 
     <!-- <link href="https://globe-asset.com/asset/theme3/frontend/img/apple-touch-icon.png" rel="apple-touch-icon">
@@ -259,7 +259,7 @@ window.smartsupp||(function(d) {
 
 </head>
 
-<body>
+<body onload="dashboard()">
 
 
     <!-- ======= Header ======= -->
@@ -364,7 +364,7 @@ window.smartsupp||(function(d) {
                 <div class="d-plan-notice mt-4 mx-3">
                     <p class="mb-0">Your current plan
                         -N/A</p>
-                    <a href="../dashboard/investmentplan.html">Upgrade plan <i class="bi bi-arrow-up"></i></a>
+                    <a href="../dashboard/investment.html">Upgrade plan <i class="bi bi-arrow-up"></i></a>
                 </div>
             </div>
 
@@ -373,7 +373,7 @@ window.smartsupp||(function(d) {
                 <ul class="mobile-bottom-menu">
                     <li>
                         <div class="dropdown" style="margin-left: 10px;">
-                            <a href="#" class="dropdown-toggle" onclick="toggleDropdown(event)">
+                            <a href="../components/settings.html" class="dropdown-toggle" onclick="toggleDropdown(event)">
                                 <i class="bi bi-person-circle"></i>
                                 <span>Profile</span>
                             </a>
@@ -429,7 +429,8 @@ window.smartsupp||(function(d) {
                                         <div class="content">
                                             <p class="text-small mb-0 text-white">Total withdraw</p>
                                             <h5 class="title text-white">
-                                                0.00 USD</h5>
+                                                <span id="totalWith"></span> USD</h5>
+                                                <!-- 0.00 USD</h5> -->
                                         </div>
                                     </div>
                                 </div>
@@ -442,7 +443,9 @@ window.smartsupp||(function(d) {
                                         <div class="content">
                                             <p class="text-small mb-0 text-white">Total deposit</p>
                                             <h5 class="title text-white">
-                                                0.00 USD</h5>
+                                                <span id="totDeposit"></span> USD</h5>
+
+                                                <!-- 0.00 USD</h5> -->
                                         </div>
                                     </div>
                                 </div>
@@ -459,7 +462,8 @@ window.smartsupp||(function(d) {
                                         <div class="content">
                                             <p class="text-small mb-0 text-white">Total invest</p>
                                             <h5 class="title text-white">
-                                                0.00 USD</h5>
+                                                <span id="totInvest"></span> USD</h5>
+                                                <!-- 0.00 USD</h5> -->
                                         </div>
                                     </div>
                                 </div>
@@ -471,8 +475,8 @@ window.smartsupp||(function(d) {
                                         <div class="content">
                                             <p class="text-small mb-0 text-white">Current invest</p>
                                             <h5 class="title text-white">
-                                                0
-                                                USD</h5>
+                                                <span id="currentInvest"></span> USD</h5>
+                                                <!-- 0 USD</h5> -->
                                         </div>
                                     </div>
                                 </div>
@@ -489,8 +493,8 @@ window.smartsupp||(function(d) {
                                 <span class="caption-title">Current plan</span>
                                 <h3 class="d-box-two-amount">
                                     N/A</h3>
-                                <a href="https://globe-asset.com/invest/all" class="link-btn"><i
-                                        class="fas fa-arrow-right"></i></a>
+                                <!-- <a href="https://globe-asset.com/invest/all" class="link-btn"><i
+                                        class="fas fa-arrow-right"></i></a> -->
                             </div>
                         </div>
                         <div class="col-xl-3 col-sm-6">
@@ -502,7 +506,7 @@ window.smartsupp||(function(d) {
                                 <h3 class="d-box-two-amount">
                                     0.00 USD
                                 </h3>
-                                <a href="https://globe-asset.com/invest/pending" class="link-btn"><i
+                                <a href="../dashboard/dashboard.html" class="link-btn"><i
                                         class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
@@ -515,11 +519,11 @@ window.smartsupp||(function(d) {
                                 <h3 class="d-box-two-amount">
                                     0.00 USD
                                 </h3>
-                                <a href="https://globe-asset.com/withdraw/pending" class="link-btn"><i
+                                <a href="../components/withdrawal-log.html" class="link-btn"><i
                                         class="fas fa-arrow-right"></i></a>
                             </div>
                         </div>
-                        <div class="col-xl-3 col-sm-6">
+                        <!-- <div class="col-xl-3 col-sm-6">
                             <div class="d-box-two">
                                 <div class="d-box-two-icon">
                                     <i class="fas fa-hand-holding-usd"></i>
@@ -528,10 +532,10 @@ window.smartsupp||(function(d) {
                                 <h3 class="d-box-two-amount">
                                     0.00 USD
                                 </h3>
-                                <a href="https://globe-asset.com/commision" class="link-btn"><i
+                                <a href="" class="link-btn"><i
                                         class="fas fa-arrow-right"></i></a>
                             </div>
-                        </div>
+                        </div> -->
                     </div>
 
                     <!-- mobile screen card start -->
@@ -543,7 +547,7 @@ window.smartsupp||(function(d) {
 
                                     <div class="col-4">
                                         <div class="mobile-box link-item">
-                                            <a href="../components/withdraw.html" class="item-link"></a>
+                                            <a href="../components/withdrawal-log.html" class="item-link"></a>
                                             <i class="bi bi-journal-text"></i>
                                             <h6 class="title">Withdraw log</h6>
                                         </div>
@@ -556,13 +560,13 @@ window.smartsupp||(function(d) {
                                         </div>
                                     </div>
 
-                                    <div class="col-4">
+                                    <!-- <div class="col-4">
                                         <div class="mobile-box link-item">
                                             <a href="../components/transaction-log.html" class="item-link"></a>
                                             <i class="bi bi-journal-text"></i>
                                             <h6 class="title">Transaction log</h6>
                                         </div>
-                                    </div>
+                                    </div> -->
                                     <div class="col-4">
                                         <div class="mobile-box link-item">
                                             <a href="../components/deposit-log.html" class="item-link"></a>
@@ -571,13 +575,13 @@ window.smartsupp||(function(d) {
                                         </div>
                                     </div>
 
-                                    <div class="col-4">
+                                    <!-- <div class="col-4">
                                         <div class="mobile-box link-item">
                                             <a href="../components/withdrawal-returns.html" class="item-link"></a>
                                             <i class="bi bi-wallet"></i>
                                             <h6 class="title">Withdraw returns</h6>
                                         </div>
-                                    </div>
+                                    </div> -->
                                 </div>
                             </div>
                         </div>
@@ -734,5 +738,6 @@ window.smartsupp||(function(d) {
 
     </script>
 
-
+    <script src="../scripts/main.js"></script>
+    <script src="../scripts/dashboard.js"></script>
     </html>

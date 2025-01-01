@@ -1,8 +1,8 @@
-"/deposit/fund-wallet"
-"/history"
-'/deposit/deposit-history/:id' 
+// "/deposit/fund-wallet"
+// "/history"
+// '/deposit/deposit-history/:id' 
 
-const baseUrl = "/api/v1/dposit/";
+const baseUrl = "/api/v1/deposit/";
 
 function clearErrors(){
     const errMsg = document.getElementById('errorMsg');
